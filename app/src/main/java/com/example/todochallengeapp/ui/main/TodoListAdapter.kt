@@ -6,8 +6,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todochallengeapp.R
+import com.example.todochallengeapp.data.Task
 
 class TodoListAdapter: RecyclerView.Adapter<TodoListAdapter.TodoListViewHolder>() {
+    private var tasks: List<Task> = listOf()
+
     class TodoListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val todoItemVewText = itemView.findViewById<TextView>(R.id.itemText)
     }
@@ -20,10 +23,16 @@ class TodoListAdapter: RecyclerView.Adapter<TodoListAdapter.TodoListViewHolder>(
     }
 
     override fun onBindViewHolder(holder: TodoListViewHolder, position: Int) {
-        holder.todoItemVewText.setText("Position = $position")
+        val task = tasks[position]
+        holder.todoItemVewText.setText(task.text)
     }
 
     override fun getItemCount(): Int {
-        return 20
+        return tasks.size
+    }
+
+    fun submitItems(tasks: List<Task>) {
+        this.tasks = tasks
+        notifyDataSetChanged()
     }
 }
