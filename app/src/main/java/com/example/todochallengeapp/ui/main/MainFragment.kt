@@ -6,12 +6,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todochallengeapp.R
 import com.example.todochallengeapp.data.Task
 import com.example.todochallengeapp.data.TodoRepository
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import okhttp3.internal.notify
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -38,6 +42,35 @@ class MainFragment : Fragment() {
         todoList.layoutManager = LinearLayoutManager(requireContext())
         todoList.adapter = adapter
         val todoRepository = TodoRepository()
+        fetchTasks(todoRepository, adapter)
+
+        val floatingButton = view.findViewById<FloatingActionButton>(R.id.floatingActionButton)
+        floatingButton.setOnClickListener {
+            //val dialogView = View.inflate(requireContext(), R.layout.item_dialog_text_view, view as ViewGroup)
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("New Dialog")
+                .setView(R.layout.item_dialog_text_view)
+                .setNegativeButton("Cancel") { _, _ -> }
+                .setPositiveButton("Save") { dialog, which ->
+                    val alertDialog = dialog as AlertDialog
+                    val text = alertDialog.findViewById<EditText>(R.id.newTodoText)!!.text.toString()
+                    todoRepository.addTask(text).enqueue(object : Callback<Task> {
+                        override fun onResponse(call: Call<Task>, response: Response<Task>) {
+                            fetchTasks(todoRepository, adapter)
+                        }
+                        override fun onFailure(call: Call<Task>, t: Throwable) {
+                            TODO("Not yet implemented")
+                        }
+                    })
+                }
+                .show()
+        }
+    }
+
+    private fun fetchTasks(
+        todoRepository: TodoRepository,
+        adapter: TodoListAdapter
+    ) {
         todoRepository.getTasks().enqueue(object : Callback<List<Task>> {
             override fun onResponse(call: Call<List<Task>>, response: Response<List<Task>>) {
                 val tasks = response.body()
@@ -50,11 +83,6 @@ class MainFragment : Fragment() {
                 TODO("Not yet implemented")
             }
         })
-
-        val floatingButton = view.findViewById<FloatingActionButton>(R.id.floatingActionButton)
-        floatingButton.setOnClickListener {
-            TODO("create Dialog with Text view and save button")
-        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

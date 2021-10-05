@@ -19,4 +19,8 @@ class TodoRepository {
     fun getTasks(): Call<List<Task>> {
        return service.showTodoListTasks()
     }
+
+    fun addTask(text: String): Call<Task> {
+        return service.addTaskToList(TaskRequestBody(text))
+    }
 }
