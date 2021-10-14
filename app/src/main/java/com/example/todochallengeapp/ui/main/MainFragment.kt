@@ -37,11 +37,29 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val todoRepository = TodoRepository()
         val todoList = view.findViewById<RecyclerView>(R.id.todoList)
-        val adapter = TodoListAdapter()
+        val adapter = TodoListAdapter({id: String ->
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("New Dialog")
+                .setView(R.layout.item_dialog_text_view)
+                .setNegativeButton("Cancel") { _, _ -> }
+                .setPositiveButton("Save") { dialog, which ->
+                    val alertDialog = dialog as AlertDialog
+                    val text = alertDialog.findViewById<EditText>(R.id.newTodoText)!!.text.toString()
+                    todoRepository.updateTask(id, text).enqueue(object : Callback<Unit> {
+                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                            //fetchTasks(todoRepository, adapter)
+                        }
+                        override fun onFailure(call: Call<Unit>, t: Throwable) {
+                            TODO("Not yet implemented")
+                        }
+                    })
+                }
+                .show()
+        })
         todoList.layoutManager = LinearLayoutManager(requireContext())
         todoList.adapter = adapter
-        val todoRepository = TodoRepository()
         fetchTasks(todoRepository, adapter)
 
         val floatingButton = view.findViewById<FloatingActionButton>(R.id.floatingActionButton)
