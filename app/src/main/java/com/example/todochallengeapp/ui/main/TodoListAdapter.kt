@@ -9,9 +9,11 @@ import com.example.todochallengeapp.R
 import com.example.todochallengeapp.data.Task
 import java.util.UUID
 
-class TodoListAdapter(private val onClickListener: (id: String) -> Unit): RecyclerView
+class TodoListAdapter(): RecyclerView
 .Adapter<TodoListAdapter.TodoListViewHolder>() {
     private var tasks: List<Task> = listOf()
+
+    var onClickListener: (id: String) -> Unit = {}
 
     class TodoListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val todoItemVewText = itemView.findViewById<TextView>(R.id.itemText)
